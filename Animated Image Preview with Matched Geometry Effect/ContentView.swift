@@ -8,16 +8,50 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Namespace private var previewSmoothly
+    @State private var preview = false
+    @State private var selectedImage: String?
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        ZStack{
+            if preview {
+                
+                if let selectedImage = selectedImage {
+                    
+                    image(selectedImage)
+                        .ignoresSafeArea()
+                }
+            } else {
+                Grid {
+                    GridRow{
+                        image("image1")
+                        image("image2")
+                    }
+                    GridRow {
+                        image("image3")
+                        image("image4")
+                    }
+                }
+                .padding(10)
+            }
         }
-        .padding()
+    }
+    
+    func image(_ imageName: String) -> some View {
+    Image(imageName)
+    .resizable()
+    .matchedGeometryEffect(id: imageName, in: previewSmoothly)
+    .zIndex(selectedImage == imageName ? 1 : 0)
+    .onTapGesture {
+        withAnimation(Animation.easeIn(duration: 0.3)) {
+            selectedImage = imageName
+            preview.toggle()
+            
+            
+        }
+    }
     }
 }
+    
 
 #Preview {
     ContentView()
